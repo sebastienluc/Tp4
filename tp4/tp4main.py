@@ -36,19 +36,19 @@ class Casse_brique:
         self.fenetre_accueil.destroy()
 
         #Creer la fenetre de jeu
-        fenetre_jeu = tk.Tk()
-        fenetre_jeu.title("Casse-brique")
-        fenetre_jeu.geometry('1200x700')
+        self.fenetre_jeu = tk.Tk()
+        self.fenetre_jeu.title("Casse-brique")
+        self.fenetre_jeu.geometry('1200x700')
 
         #pour quitter le jeu
         BoutonQuitter = tk.Button(self.fenetre_jeu, text = "quitter", fg = 'red', command = self.fenetre_jeu.destroy, font=("Helvetica", 18))
         BoutonQuitter.pack(side = 'bottom',pady = 20 )
 
         #on affiche le nombre de vies et le score 
-        label_vie = tk.Label(self.fenetre_jeu, text="Vies : 3")
-        label_vie.pack(pady=10)
-        label_score = tk.Label(self.fenetre_jeu, text="Score : 0")
-        label_score.pack(pady=10)
+        label_vie = tk.Label(self.fenetre_jeu, text="Vies : 3",font=("Helvetica", 20))
+        label_vie.place(x=20, y=20, anchor="w")
+        label_score = tk.Label(self.fenetre_jeu, text="Score : 0",font=("Helvetica", 20))
+        label_score.place(x=1180, y=20, anchor="e")
 
         self.fenetre_jeu.mainloop()
 
