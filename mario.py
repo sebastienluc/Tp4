@@ -19,7 +19,7 @@ raquette_y = 450
 # Créer un cercle rouge sur le canvas
 cercle = canvas.create_oval(400, 400, 420, 420, fill="red", outline="red", width=2)
 
-
+#créer les briques sur le canvas
 for i in range(25, 760, 95):
     for j in range(20, 150, 30):
         canvas.create_rectangle(i, j, i + 75, j + 20, fill="green", outline="green")
