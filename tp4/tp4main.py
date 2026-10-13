@@ -37,6 +37,7 @@ class Raquette:
         elif direction == "Right":
             self.x += 10
 
+        #empêche la raquette de sortir du canvas
         if self.x < 0:
             self.x = 0
 
@@ -126,6 +127,8 @@ class Casse_brique:
         self.fenetre_jeu = tk.Tk()
         self.fenetre_jeu.title("Casse-brique")
         self.fenetre_jeu.geometry('1200x700')
+        
+        self.fenetre_jeu.focus_force()
 
         #pour quitter le jeu
         BoutonQuitter = tk.Button(self.fenetre_jeu,
@@ -176,33 +179,23 @@ class Casse_brique:
         self.raquette = Raquette(self.canvas)
         self.balle = Balle(self.canvas)
 
-        #mettre en place le système de déplacement de la raquette avec les touches gauch et droite
+        #mettre en place le système de déplacement de la raquette avec les touches gauche et droite
         self.fenetre_jeu.bind(
-            "<KeyPress>",
-            self.deplacer_raquette
+            "<Left>",
+            lambda event: self.deplacer_raquette("Left")
+        )
+        self.fenetre_jeu.bind(
+            "<Right>",
+            lambda event: self.deplacer_raquette("Right")
         )
 
         self.deplacer_balle()
+        self.fenetre_jeu.mainloop()
 
-    #créer la raquette et la placer sur le canvas
-        self.canvas = canvas
-
-        self.x = 565
-        self.y = 550
-
-        self.objet = canvas.create_rectangle(
-            self.x,
-            self.y,
-            self.x + 70,
-            self.y + 10,
-            fill="blue",
-            tags="raquette"
-        )
 
     #mettre en place le système de déplacement de la raquette avec les touches gauche et droite 
-
     def deplacer_raquette(self, event):
-        self.raquette.deplacer(event.keysym)
+        self.raquette.deplacer(event)
 
     def deplacer_balle(self):
 
