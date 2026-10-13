@@ -126,7 +126,7 @@ class Jeu:
             for i in range(25, 1150, 115):
                 brique = Brique(self.canvas, i, j)
                 self.briques.append(brique)
-
+                
         self.fenetre.bind( "<KeyPress>", self.deplacer_raquette )
 
         self.deplacer_balle()
