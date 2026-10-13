@@ -13,7 +13,7 @@ class Raquette:
 
     def __init__(self, canvas):
 
-        #créer la raquette et la placer sur le canvas
+        #création de la raquette et la placer sur le canvas
         self.canvas = canvas
 
         self.x = 565
@@ -28,7 +28,7 @@ class Raquette:
             tags="raquette"
         )
 
-    #mettre en place le système de déplacement de la raquette avec les touches gauche et droite 
+    #mise en place du système de déplacement de la raquette avec les touches gauche et droite 
     def deplacer(self, direction):
 
         if direction == "Left":
@@ -52,11 +52,30 @@ class Raquette:
             self.y + 10
         )
 
+class Brique:
+
+    def __init__(self, canvas, x, y):
+
+        self.canvas = canvas
+        self.objet = canvas.create_rectangle(
+            x,
+            y, 
+            x + 90,
+            y + 20,
+            fill="green",
+            outline="green",
+            tags="brique"
+        )
+
+    def detruire(self):
+        self.canvas.delete(self.objet)
+
+
 class Balle:
 
     def __init__(self, canvas):
 
-        #créer la balle et la placer sur le canvas
+        #création de la balle et la placer sur le canvas
         self.canvas = canvas
 
         self.objet = canvas.create_oval(
@@ -71,7 +90,7 @@ class Balle:
         self.dx = random.choice([-5, 5])
         self.dy = -5
 
-    #mettre en place le système de déplacement de la balle
+    #mise en place du système de déplacement de la balle
     def deplacer(self):
 
         self.canvas.move(
@@ -80,10 +99,59 @@ class Balle:
             self.dy
         )
 
+        # On vérifie les collisions avec les murs à chaque déplacement
+        self.collision_murs()
+
+
+    #création de la physique de la balle pour qu'elle rebondisse sur les murs , la raquette et les briques 
+    def collision_murs(self):
+
+        x1, y1, x2, y2 = self.canvas.coords( self.objet )
+
+        if x1 <= 0:
+            self.dx = 5
+
+        if x2 >= 1200:
+            self.dx = -5
+
+        if y1 <= 0:
+            self.dy = 5
+
+        if y2 >= 600:
+            self.canvas.master.destroy()
+
+    def collision_raquette(self, raquette):
+
+        x1, y1, x2, y2 = self.canvas.coords( self.objet )
+        rx1, ry1, rx2, ry2 = self.canvas.coords( raquette.objet )
+
+        if x2 >= rx1 and x1 <= rx2 and y2 >= ry1 and y1 <= ry2:
+            self.dy = -5
+
+    def collision_briques(self, briques):
+
+        x1, y1, x2, y2 = self.canvas.coords(self.objet)
+
+        objets = self.canvas.find_overlapping(x1, y1, x2, y2)
+
+        for brique in briques:
+
+            if brique.objet in objets:
+
+                # Détruire la brique
+                brique.detruire()
+                briques.remove(brique)
+
+                # Faire rebondir la balle
+                self.dy = -self.dy
+
+                # Arrêter la recherche après une colision
+                break
+
 class Casse_brique:
     def __init__(self):
         
-        #Creer la fenêtre d'accueil avant de lancer la partie
+        #Créartion de la fenêtre d'accueil avant de lancer la partie
         self.fenetre_accueil = tk.Tk()
         self.fenetre_accueil.title("Casse-brique")
         self.fenetre_accueil.geometry('1200x700')
@@ -120,10 +188,11 @@ class Casse_brique:
         self.fenetre_accueil.mainloop()
 
     def lancer_le_jeu(self):
+
         #on ferme la fenetre d'accueil
         self.fenetre_accueil.destroy()
 
-        #Creer la fenetre de jeu
+        #Création de la fenetre de jeu
         self.fenetre_jeu = tk.Tk()
         self.fenetre_jeu.title("Casse-brique")
         self.fenetre_jeu.geometry('1200x700')
@@ -165,7 +234,7 @@ class Casse_brique:
             anchor="e"
         )
 
-        #mettre le canvas sur la fenêtre de jeu
+        #mise en place du canvas sur la fenêtre de jeu
         self.canvas = tk.Canvas(
             self.fenetre_jeu,
             width=1200,
@@ -175,11 +244,21 @@ class Casse_brique:
 
         self.canvas.pack()
 
-        #mettre la raquette et la balle sur le canvas
+        #mise en place de la raquette et de la balle sur le canvas
         self.raquette = Raquette(self.canvas)
         self.balle = Balle(self.canvas)
 
-        #mettre en place le système de déplacement de la raquette avec les touches gauche et droite
+        self.briques = []
+        # On crée 4 rangées de briques espacées proprement
+        for rangee in range(4):
+            for col in range(12):
+                x_pos = 15 + col * 98
+                y_pos = 50 + rangee * 30
+                nouvelle_brique = Brique(self.canvas, x_pos, y_pos)
+                self.briques.append(nouvelle_brique)
+
+
+        #mise en place du système de déplacement de la raquette avec les touches gauche et droite
         self.fenetre_jeu.bind(
             "<Left>",
             lambda event: self.deplacer_raquette("Left")
@@ -193,7 +272,7 @@ class Casse_brique:
         self.fenetre_jeu.mainloop()
 
 
-    #mettre en place le système de déplacement de la raquette avec les touches gauche et droite 
+    #mise en place du système de déplacement de la raquette avec les touches gauche et droite 
     def deplacer_raquette(self, event):
         self.raquette.deplacer(event)
 
@@ -201,9 +280,18 @@ class Casse_brique:
 
         self.balle.deplacer()
 
+        self.balle.collision_raquette(self.raquette)
+
         self.fenetre_jeu.after(
             30,
             self.deplacer_balle
         )
+
+        # Si une brique est touchée, on met à jour le score
+        if self.balle.collision_briques(self.briques):
+            self.score += 10
+            self.label_score.config(text=f"Score : {self.score}")
+
+
 
 jeu = Casse_brique()
