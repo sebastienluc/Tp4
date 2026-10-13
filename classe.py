@@ -41,11 +41,13 @@ class Balle:
         self.dx = random.choice([-5, 5])
         self.dy = -5
 
-    def deplacer(self):
+    def deplacer(self, briques):
 
-        self.canvas.move( self.objet, self.dx, self.dy )
+        self.canvas.move(self.objet, self.dx, self.dy)
+
         self.colision_murs()
         self.colision_raquette(self.raquette)
+        self.collision_briques(briques)
 
 
     def colision_murs(self):
@@ -72,6 +74,37 @@ class Balle:
         if x2 >= rx1 and x1 <= rx2 and y2 >= ry1 and y1 <= ry2:
             self.dy = -5
 
+    def collision_briques(self, briques):
+
+        x1, y1, x2, y2 = self.canvas.coords(self.objet)
+
+        objets = self.canvas.find_overlapping(x1, y1, x2, y2)
+
+        for brique in briques:
+
+            if brique.objet in objets:
+
+                # Détruire la brique
+                brique.detruire()
+                briques.remove(brique)
+
+                # Faire rebondir la balle
+                self.dy = -self.dy
+
+                # Arrêter la recherche après une collision
+                break
+
+
+class Brique:
+
+    def __init__(self, canvas, x, y):
+
+        self.canvas = canvas
+        self.objet = canvas.create_rectangle( x, y, x + 90, y + 20, fill="green", outline="green", tags="brique" )
+
+    def detruire(self):
+        self.canvas.delete(self.objet)
+
 
 class Jeu:
 
@@ -88,6 +121,12 @@ class Jeu:
         self.raquette = Raquette(self.canvas)
         self.balle = Balle(self.canvas, self.raquette)
 
+        self.briques = []
+        for j in range(30, 160, 40):
+            for i in range(25, 1150, 115):
+                brique = Brique(self.canvas, i, j)
+                self.briques.append(brique)
+
         self.fenetre.bind( "<KeyPress>", self.deplacer_raquette )
 
         self.deplacer_balle()
@@ -97,7 +136,7 @@ class Jeu:
 
     def deplacer_balle(self):
 
-        self.balle.deplacer()
+        self.balle.deplacer(self.briques)
 
         self.fenetre.after( 30, self.deplacer_balle )
 
