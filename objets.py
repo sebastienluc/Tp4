@@ -75,23 +75,50 @@ class Balle:
             self.dy = -5
 
     def collision_briques(self, briques):
-
+        # Coordonnées actuelles de la balle
         x1, y1, x2, y2 = self.canvas.coords(self.objet)
 
+        # Coordonnées précédentes de la balle
+        ancien_x1 = x1 - self.dx
+        ancien_y1 = y1 - self.dy
+        ancien_x2 = x2 - self.dx
+        ancien_y2 = y2 - self.dy
+
+        # Objets touchés par la balle
         objets = self.canvas.find_overlapping(x1, y1, x2, y2)
 
         for brique in briques:
-
             if brique.objet in objets:
+                # Coordonnées de la brique
+                bx1, by1, bx2, by2 = self.canvas.coords(brique.objet)
 
-                # Détruire la brique
+                # Déterminer le côté de collision
+                choc_horizontal = (
+                    ancien_x2 <= bx1 or ancien_x1 >= bx2
+                )
+
+                choc_vertical = (
+                    ancien_y2 <= by1 or ancien_y1 >= by2
+                )
+
+                if choc_horizontal and not choc_vertical:
+                    # Collision sur un côté gauche ou droit
+                    self.dx = -self.dx
+
+                elif choc_vertical and not choc_horizontal:
+                    # Collision sur le dessus ou le dessous
+                    self.dy = -self.dy
+
+                else:
+                    # Collision sur un coin
+                    self.dx = -self.dx
+                    self.dy = -self.dy
+
+                # Détruire la brique touchée
                 brique.detruire()
                 briques.remove(brique)
 
-                # Faire rebondir la balle
-                self.dy = -self.dy
-
-                # Arrêter la recherche après une collision
+                # Arrêter la boucle après une collision
                 break
 
 
