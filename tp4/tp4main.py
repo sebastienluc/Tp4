@@ -6,7 +6,6 @@ to do : avancer sur le tp
 '''
 
 import tkinter as tk
-from tkinter import messagebox
 import random
 
 class Raquette:
@@ -17,7 +16,7 @@ class Raquette:
         self.canvas = canvas
 
         self.x = 565
-        self.y = 550
+        self.y = 450
 
         self.objet = canvas.create_rectangle(
             self.x,
@@ -80,9 +79,9 @@ class Balle:
 
         self.objet = canvas.create_oval(
             590,
-            400,
+            300,
             610,
-            420,
+            320,
             fill="red",
             outline="red"
         )
@@ -99,8 +98,8 @@ class Balle:
             self.dy
         )
 
-        # On vérifie les collisions avec les murs à chaque déplacement
-        self.collision_murs()
+        return self.collision_murs()
+
 
 
     #création de la physique de la balle pour qu'elle rebondisse sur les murs , la raquette et les briques 
@@ -118,7 +117,9 @@ class Balle:
             self.dy = 5
 
         if y2 >= 600:
-            self.canvas.master.destroy()
+            return False # la balle a touché le bas 
+
+        return True # la balle est encore en jeu 
 
     def collision_raquette(self, raquette):
 
@@ -146,7 +147,8 @@ class Balle:
                 self.dy = -self.dy
 
                 # Arrêter la recherche après une colision
-                break
+                return True 
+        return False
 
 class Casse_brique:
     def __init__(self):
@@ -196,8 +198,30 @@ class Casse_brique:
         self.fenetre_jeu = tk.Tk()
         self.fenetre_jeu.title("Casse-brique")
         self.fenetre_jeu.geometry('1200x700')
+
+        self.score = 0
+        self.vies = 3
         
         self.fenetre_jeu.focus_force()
+
+        #barre de stats
+        self.frame_stats = tk.Frame(self.fenetre_jeu, bg="#eeeeee", height=50)
+        self.frame_stats.pack(fill="x", side="top")
+
+        self.label_vie = tk.Label(self.frame_stats,
+            text=f"Vies : {self.vies}",   
+            font=("Helvetica", 20),
+            bg="#eeeeee"
+        )
+        self.label_vie.pack(side="left", padx=30, pady=10)
+
+        self.label_score = tk.Label(self.frame_stats, 
+            text=f"Score : {self.score}",
+            font=("Helvetica", 20),
+            bg="#eeeeee"
+        )
+        self.label_score.pack(side="right", padx=30, pady=10)
+
 
         #pour quitter le jeu
         BoutonQuitter = tk.Button(self.fenetre_jeu,
@@ -212,33 +236,12 @@ class Casse_brique:
             pady = 20 
         )
 
-        #on affiche le nombre de vies et le score 
-        label_vie = tk.Label(self.fenetre_jeu,
-            text="Vies : 3",   
-            font=("Helvetica", 20)
-        )
-
-        label_vie.place(x=20,
-            y=20,
-            anchor="w"
-        )
-
-        label_score = tk.Label(self.fenetre_jeu, 
-            text="Score : 0",
-            font=("Helvetica", 20)
-        )
-
-        label_score.place(
-            x=1180,
-            y=20,
-            anchor="e"
-        )
 
         #mise en place du canvas sur la fenêtre de jeu
         self.canvas = tk.Canvas(
             self.fenetre_jeu,
             width=1200,
-            height=600,
+            height=500,
             bg="black"
         )
 
@@ -278,20 +281,39 @@ class Casse_brique:
 
     def deplacer_balle(self):
 
-        self.balle.deplacer()
+        # On récupère le statut de la balle (True si en l'air, False si tombée)
+        balle_en_jeu = self.balle.deplacer()
+
+        if not balle_en_jeu:
+            self.vies -= 1
+            self.label_vie.config(text=f"Vies : {self.vies}")
+            
+            if self.vies <= 0:
+                # Plus de vies : Game over et fermeture de la fenêtre
+                self.fenetre_jeu.destroy()
+                print(f"Game Over ! Score final : {self.score}")
+                return
+            else:
+                # Il reste des vies : On replace la balle au milieu
+                self.canvas.coords(self.balle.objet, 590, 400, 610, 420)
+                self.balle.dy = -5
+                self.balle.dx = random.choice([-5, 5])
 
         self.balle.collision_raquette(self.raquette)
-
-        self.fenetre_jeu.after(
-            30,
-            self.deplacer_balle
-        )
 
         # Si une brique est touchée, on met à jour le score
         if self.balle.collision_briques(self.briques):
             self.score += 10
             self.label_score.config(text=f"Score : {self.score}")
 
+        #Détection des briques placées au bon endroit 
+        if self.balle.collision_briques(self.briques):
+            self.score += 10
+            self.label_score.config(text=f"Score : {self.score}")
 
+        self.fenetre_jeu.after(
+            30,
+            self.deplacer_balle
+        )
 
 jeu = Casse_brique()
