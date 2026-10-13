@@ -289,9 +289,16 @@ class Casse_brique:
             self.label_vie.config(text=f"Vies : {self.vies}")
             
             if self.vies <= 0:
-                # Plus de vies : Game over et fermeture de la fenêtre
-                self.fenetre_jeu.destroy()
-                print(f"Game Over ! Score final : {self.score}")
+                # Défaite s'il reste des briques
+                if len(self.briques) > 0:
+                    self.en_cours = False
+                    self.canvas.create_text(
+                        600, 250,
+                        text="DÉFAITE !\nVous n'avez plus de vies.",
+                        fill="red",
+                        font=("Helvetica", 36, "bold"),
+                        justify="center"
+                    )
                 return
             else:
                 # Il reste des vies : On replace la balle au milieu
@@ -311,6 +318,18 @@ class Casse_brique:
             self.score += 10
             self.label_score.config(text=f"Score : {self.score}")
 
+        # S'il reste des vies et toutes les briques sont détruites, on affiche "victoire"
+        if len(self.briques) == 0:
+                self.en_cours = False
+                self.canvas.create_text(
+                    600, 250,
+                    text=f"VICTOIRE !\nScore final : {self.score}",
+                    fill="yellow",
+                    font=("Helvetica", 36, "bold"),
+                    justify="center"
+                )
+                return
+        
         self.fenetre_jeu.after(
             30,
             self.deplacer_balle
