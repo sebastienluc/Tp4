@@ -7,7 +7,7 @@ class Jeu:
 
     def __init__(self):
         
-        #Créartion de la fenêtre d'accueil avant de lancer la partie
+        #Création de la fenêtre d'accueil avant de lancer la partie
         self.fenetre_accueil = tk.Tk()
         self.fenetre_accueil.title("Casse-brique")
         self.fenetre_accueil.geometry(f"{largeur_ecran}x{hauteur_ecran + 100}")
