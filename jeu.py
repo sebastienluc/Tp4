@@ -1,6 +1,6 @@
 import tkinter as tk
 import random
-from objets import Raquette, Balle, Brique, Brique_dur
+from objets import Raquette, Balle, Brique, Brique_dur, Brique_indestructible
 
 
 class Jeu:
@@ -39,6 +39,16 @@ class Jeu:
             width=15
         )
         BoutonNiveau2.pack(pady=15)
+
+        # Bouton pour lancer le niveau 3
+        BoutonNiveau3 = tk.Button(
+            self.fenetre_accueil,
+            text="Niveau 3",
+            command=lambda: self.lancer_le_jeu(3),
+            font=("Helvetica", 18),
+            width=15
+        )
+        BoutonNiveau3.pack(pady=15)
 
         #pour quitter le jeu
         BoutonQuitter = tk.Button(self.fenetre_accueil,
@@ -122,15 +132,20 @@ class Jeu:
 
         if self.niveau == 1:
             classes_briques = [Brique]  # on met que des briques normales pour le niveau 1
-        else:
-            classes_briques = [Brique, Brique_dur]  # 50% de chance pour chaque classe
+        elif self.niveau == 2:
+            classes_briques = [Brique, Brique, Brique_dur]  
+        elif self.niveau == 3:
+            classes_briques = [Brique,]  
 
         for rangee in range(4):
             for col in range(12):
                 x_pos = 15 + col * 98
                 y_pos = 50 + rangee * 30
-                ClasseChoisie = random.choice(classes_briques)  # 1. On choisit une classe au hasard (50% de chance pour chaque)
-                nouvelle_brique = ClasseChoisie(self.canvas, x_pos, y_pos)  # 2. On instancie la brique choisie dynamiquement
+                if col % 3 == rangee and rangee % 2 == 0 and self.niveau == 3:
+                    ClasseChoisie = Brique_indestructible
+                else:
+                    ClasseChoisie = random.choice(classes_briques)  #  On choisit une classe au hasard 
+                nouvelle_brique = ClasseChoisie(self.canvas, x_pos, y_pos)  
                 self.briques.append(nouvelle_brique)
 
 

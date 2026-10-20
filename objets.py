@@ -186,7 +186,7 @@ class Balle:
                 brique.detruire()
                 briques[index] = nouvelle_brique
 
-            else:
+            elif isinstance(brique, Brique):
                 # Une brique simple est détruite
                 brique.detruire()
                 briques.remove(brique)
@@ -229,10 +229,27 @@ class Brique_dur:
             y, 
             x + 90,
             y + 20,
-            fill="#26500A", # Super choix de vert foncé !
+            fill="#26500A", 
             outline="#26500A",
             tags="brique_dur"
         )
 
     def detruire(self):
         self.canvas.delete(self.objet)
+
+class Brique_indestructible:
+
+    def __init__(self, canvas, x, y):
+        self.canvas = canvas
+        # 1. On stocke également x et y ici
+        self.x = x
+        self.y = y
+        self.objet = canvas.create_rectangle(
+            x,
+            y, 
+            x + 90,
+            y + 20,
+            fill="#676778", 
+            outline="#676778",
+            tags="brique_indestructible"
+        )
