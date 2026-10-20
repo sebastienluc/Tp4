@@ -74,8 +74,8 @@ class Balle:
             outline="red"
         )
 
-        self.dx = random.choice([-vitesse_balle, vitesse_balle])
-        self.dy = -vitesse_balle
+        self.dx = random.choice([-5, 5])
+        self.dy = -5
 
     #mise en place du système de déplacement de la balle
     def deplacer(self):

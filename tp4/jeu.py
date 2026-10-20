@@ -160,12 +160,12 @@ class Jeu:
                 self.canvas.coords(
                     self.balle.objet,
                     largeur_ecran // 2 - 10,
-                    hauteur_ecran // 2 - 10,
+                    (hauteur_ecran - 100) // 2 - 10,
                     largeur_ecran // 2 + 10,
-                    largeur_ecran // 2 + 10
+                    (hauteur_ecran - 100) // 2 + 10
                     )
 
-                self.balle.dy = - vitesse_balle
+                self.balle.dy = -vitesse_balle
                 self.balle.dx = random.choice([-vitesse_balle, vitesse_balle])
 
         self.balle.collision_raquette(self.raquette)
