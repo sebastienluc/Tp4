@@ -20,14 +20,25 @@ class Jeu:
         
         label_titre.pack(pady=100)
 
-        #pour lancer la partie
-        BoutonLancer = tk.Button(self.fenetre_accueil,
-            text = "Start", 
-            command = self.lancer_le_jeu,
-            font=("Helvetica", 18)
+        # Bouton pour lancer le niveau 1
+        BoutonNiveau1 = tk.Button(
+            self.fenetre_accueil,
+            text="Niveau 1",
+            command=lambda: self.lancer_le_jeu(1),
+            font=("Helvetica", 18),
+            width=15
         )
-        
-        BoutonLancer.pack(pady=100)
+        BoutonNiveau1.pack(pady=15)
+
+        # Bouton pour lancer le niveau 2
+        BoutonNiveau2 = tk.Button(
+            self.fenetre_accueil,
+            text="Niveau 2",
+            command=lambda: self.lancer_le_jeu(2),
+            font=("Helvetica", 18),
+            width=15
+        )
+        BoutonNiveau2.pack(pady=15)
 
         #pour quitter le jeu
         BoutonQuitter = tk.Button(self.fenetre_accueil,
@@ -43,7 +54,8 @@ class Jeu:
 
         self.fenetre_accueil.mainloop()
 
-    def lancer_le_jeu(self):
+    def lancer_le_jeu(self, niveau):
+        self.niveau = niveau
 
         #on ferme la fenetre d'accueil
         self.fenetre_accueil.destroy()
@@ -107,13 +119,18 @@ class Jeu:
 
         self.briques = []
         # On crée 4 rangées de briques espacées proprement
+
+        if self.niveau == 1:
+            classes_briques = [Brique]  # on met que des briques normales pour le niveau 1
+        else:
+            classes_briques = [Brique, Brique_dur]  # 50% de chance pour chaque classe
+
         for rangee in range(4):
             for col in range(12):
                 x_pos = 15 + col * 98
                 y_pos = 50 + rangee * 30
-                classes_briques = [Brique, Brique_dur]          # 1. On liste les deux classes disponibles
-                ClasseChoisie = random.choice(classes_briques)  # 2. On choisit une classe au hasard (50% de chance pour chaque)
-                nouvelle_brique = ClasseChoisie(self.canvas, x_pos, y_pos)  # 3. On instancie la brique choisie dynamiquement
+                ClasseChoisie = random.choice(classes_briques)  # 1. On choisit une classe au hasard (50% de chance pour chaque)
+                nouvelle_brique = ClasseChoisie(self.canvas, x_pos, y_pos)  # 2. On instancie la brique choisie dynamiquement
                 self.briques.append(nouvelle_brique)
 
 
