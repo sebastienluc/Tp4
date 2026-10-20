@@ -1,6 +1,6 @@
 import tkinter as tk
 import random
-from objets import Raquette, Balle, Brique
+from objets import Raquette, Balle, Brique, largeur_ecran, hauteur_ecran, vitesse_balle
 
 
 class Jeu:
@@ -10,7 +10,7 @@ class Jeu:
         #Créartion de la fenêtre d'accueil avant de lancer la partie
         self.fenetre_accueil = tk.Tk()
         self.fenetre_accueil.title("Casse-brique")
-        self.fenetre_accueil.geometry('1200x700')
+        self.fenetre_accueil.geometry(f"{largeur_ecran}x{hauteur_ecran + 100}")
 
         #titre du jeu
         label_titre = tk.Label(self.fenetre_accueil,
@@ -21,23 +21,23 @@ class Jeu:
         label_titre.pack(pady=100)
 
         #pour lancer la partie
-        BoutonLancer = tk.Button(self.fenetre_accueil,
+        boutonlancer = tk.Button(self.fenetre_accueil,
             text = "Start", 
             command = self.lancer_le_jeu,
             font=("Helvetica", 18)
         )
         
-        BoutonLancer.pack(pady=100)
+        boutonlancer.pack(pady=100)
 
         #pour quitter le jeu
-        BoutonQuitter = tk.Button(self.fenetre_accueil,
+        boutonquitter = tk.Button(self.fenetre_accueil,
             text = "quitter", 
             fg = 'red', 
             command = self.fenetre_accueil.destroy, 
             font=("Helvetica", 18)
         )
         
-        BoutonQuitter.pack(side = 'bottom',
+        boutonquitter.pack(side = 'bottom',
             pady = 60
         )
 
@@ -51,7 +51,7 @@ class Jeu:
         #Création de la fenetre de jeu
         self.fenetre_jeu = tk.Tk()
         self.fenetre_jeu.title("Casse-brique")
-        self.fenetre_jeu.geometry('1200x700')
+        self.fenetre_jeu.geometry(f"{largeur_ecran}x{hauteur_ecran + 100}")
 
         self.score = 0
         self.vies = 3
@@ -78,14 +78,14 @@ class Jeu:
 
 
         #pour quitter le jeu
-        BoutonQuitter = tk.Button(self.fenetre_jeu,
+        boutonquitter = tk.Button(self.fenetre_jeu,
             text = "quitter", 
             fg = 'red', 
             command = self.fenetre_jeu.destroy, 
             font=("Helvetica", 18)
         )
 
-        BoutonQuitter.pack(
+        boutonquitter.pack(
             side = 'bottom',
             pady = 20 
         )
@@ -94,8 +94,8 @@ class Jeu:
         #mise en place du canvas sur la fenêtre de jeu
         self.canvas = tk.Canvas(
             self.fenetre_jeu,
-            width=1200,
-            height=500,
+            width=largeur_ecran,
+            height=largeur_ecran - 100,
             bg="black"
         )
 
@@ -147,7 +147,8 @@ class Jeu:
                 if len(self.briques) > 0:
                     self.en_cours = False
                     self.canvas.create_text(
-                        600, 250,
+                        largeur_ecran // 2,
+                        hauteur_ecran // 2,
                         text="DÉFAITE !\nVous n'avez plus de vies.",
                         fill="red",
                         font=("Helvetica", 36, "bold"),
@@ -156,9 +157,16 @@ class Jeu:
                 return
             else:
                 # Il reste des vies : On replace la balle au milieu
-                self.canvas.coords(self.balle.objet, 590, 400, 610, 420)
-                self.balle.dy = -5
-                self.balle.dx = random.choice([-5, 5])
+                self.canvas.coords(
+                    self.balle.objet,
+                    largeur_ecran // 2 - 10,
+                    hauteur_ecran // 2 - 10,
+                    largeur_ecran // 2 + 10,
+                    largeur_ecran // 2 + 10
+                    )
+
+                self.balle.dy = - vitesse_balle
+                self.balle.dx = random.choice([-vitesse_balle, vitesse_balle])
 
         self.balle.collision_raquette(self.raquette)
 
@@ -176,7 +184,8 @@ class Jeu:
         if len(self.briques) == 0:
                 self.en_cours = False
                 self.canvas.create_text(
-                    600, 250,
+                    largeur_ecran // 2,
+                    hauteur_ecran // 2,
                     text=f"VICTOIRE !\nScore final : {self.score}",
                     fill="yellow",
                     font=("Helvetica", 36, "bold"),

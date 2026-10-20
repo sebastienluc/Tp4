@@ -1,7 +1,6 @@
 import tkinter as tk
 import random
 
-<<<<<<< HEAD
 largeur_ecran = 1200
 hauteur_ecran = 600
 
@@ -14,8 +13,6 @@ vitesse_balle = 5
 
 largeur_brique = 90
 hauteur_brique = 20
-=======
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
 
 class Raquette:
 
@@ -24,24 +21,14 @@ class Raquette:
         #création de la raquette et la placer sur le canvas
         self.canvas = canvas
 
-<<<<<<< HEAD
         self.x = (largeur_ecran - largeur_raquette) // 2
         self.y = hauteur_ecran - 150
-=======
-        self.x = 565
-        self.y = 450
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
 
         self.objet = canvas.create_rectangle(
             self.x,
             self.y,
-<<<<<<< HEAD
             self.x + largeur_raquette,
             self.y + hauteur_raquette,
-=======
-            self.x + 70,
-            self.y + 10,
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
             fill="blue",
             tags="raquette"
         )
@@ -50,7 +37,6 @@ class Raquette:
     def deplacer(self, direction):
 
         if direction == "Left":
-<<<<<<< HEAD
             self.x -= vitesse_raquette
 
         elif direction == "Right":
@@ -63,31 +49,13 @@ class Raquette:
 
         if self.x > limite_droite:
             self.x = limite_droite
-=======
-            self.x -= 10
-
-        elif direction == "Right":
-            self.x += 10
-
-        #empêche la raquette de sortir du canvas
-        if self.x < 0:
-            self.x = 0
-
-        if self.x > 1130:
-            self.x = 1130
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
 
         self.canvas.coords(
             self.objet,
             self.x,
             self.y,
-<<<<<<< HEAD
             self.x + largeur_raquette,
             self.y + hauteur_raquette
-=======
-            self.x + 70,
-            self.y + 10
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
         )
 
 class Balle:
@@ -98,28 +66,16 @@ class Balle:
         self.canvas = canvas
 
         self.objet = canvas.create_oval(
-<<<<<<< HEAD
             largeur_ecran // 2 - rayon_balle,
             hauteur_ecran // 2 - rayon_balle,
             largeur_ecran // 2 + rayon_balle,
             hauteur_ecran // 2 + rayon_balle,
-=======
-            590,
-            300,
-            610,
-            320,
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
             fill="red",
             outline="red"
         )
 
-<<<<<<< HEAD
-        self.dx = random.choice([- vitesse_balle, vitesse_balle])
+        self.dx = random.choice([-vitesse_balle, vitesse_balle])
         self.dy = -vitesse_balle
-=======
-        self.dx = random.choice([-5, 5])
-        self.dy = -5
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
 
     #mise en place du système de déplacement de la balle
     def deplacer(self):
@@ -137,30 +93,18 @@ class Balle:
     #création de la physique de la balle pour qu'elle rebondisse sur les murs , la raquette et les briques 
     def collision_murs(self):
 
-        x1, y1, x2, y2 = self.canvas.coords( self.objet )
+        x1, y1, x2, y2 = self.canvas.coords(self.objet )
 
         if x1 <= 0:
-<<<<<<< HEAD
             self.dx = vitesse_balle
 
         if x2 >= largeur_ecran:
-            self.dx = - vitesse_balle
+            self.dx = -vitesse_balle
 
         if y1 <= 0:
             self.dy = vitesse_balle
 
         if y2 >= hauteur_ecran:
-=======
-            self.dx = 5
-
-        if x2 >= 1200:
-            self.dx = -5
-
-        if y1 <= 0:
-            self.dy = 5
-
-        if y2 >= 600:
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
             return False # la balle a touché le bas 
 
         return True # la balle est encore en jeu 
@@ -171,11 +115,7 @@ class Balle:
         rx1, ry1, rx2, ry2 = self.canvas.coords( raquette.objet )
 
         if x2 >= rx1 and x1 <= rx2 and y2 >= ry1 and y1 <= ry2:
-<<<<<<< HEAD
             self.dy = - vitesse_balle
-=======
-            self.dy = -5
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
 
 
     def collision_briques(self, briques):
@@ -234,13 +174,8 @@ class Brique:
         self.objet = canvas.create_rectangle(
             x,
             y, 
-<<<<<<< HEAD
             x + largeur_brique,
             y + hauteur_brique,
-=======
-            x + 90,
-            y + 20,
->>>>>>> 1a5a6e541f19ae5fcadfeda02a78f81486b0a66c
             fill="green",
             outline="green",
             tags="brique"
