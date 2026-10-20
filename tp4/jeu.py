@@ -1,6 +1,6 @@
 import tkinter as tk
 import random
-from objets import Raquette, Balle, Brique, largeur_ecran, hauteur_ecran, vitesse_balle
+from objets import Raquette, Balle, Brique, largeur_ecran, hauteur_ecran, vitesse_balle, Brique_dur
 
 
 class Jeu:
@@ -20,30 +20,42 @@ class Jeu:
         
         label_titre.pack(pady=100)
 
-        #pour lancer la partie
-        boutonlancer = tk.Button(self.fenetre_accueil,
-            text = "Start", 
-            command = self.lancer_le_jeu,
-            font=("Helvetica", 18)
+        # Bouton pour lancer le niveau 1
+        bouton_niveau1 = tk.Button(
+            self.fenetre_accueil,
+            text="Niveau 1",
+            command=lambda: self.lancer_le_jeu(1),
+            font=("Helvetica", 18),
+            width=15
         )
-        
-        boutonlancer.pack(pady=100)
+        bouton_niveau1.pack(pady=15)
+
+        # Bouton pour lancer le niveau 2
+        bouton_niveau2 = tk.Button(
+            self.fenetre_accueil,
+            text="Niveau 2",
+            command=lambda: self.lancer_le_jeu(2),
+            font=("Helvetica", 18),
+            width=15
+        )
+        bouton_niveau2.pack(pady=15)
 
         #pour quitter le jeu
-        boutonquitter = tk.Button(self.fenetre_accueil,
+        bouton_quitter = tk.Button(self.fenetre_accueil,
             text = "quitter", 
             fg = 'red', 
             command = self.fenetre_accueil.destroy, 
             font=("Helvetica", 18)
         )
         
-        boutonquitter.pack(side = 'bottom',
+        bouton_quitter.pack(side = 'bottom',
             pady = 60
         )
 
         self.fenetre_accueil.mainloop()
 
-    def lancer_le_jeu(self):
+    def lancer_le_jeu(self,niveau):
+        self.niveau = niveau
 
         #on ferme la fenetre d'accueil
         self.fenetre_accueil.destroy()
@@ -78,14 +90,14 @@ class Jeu:
 
 
         #pour quitter le jeu
-        boutonquitter = tk.Button(self.fenetre_jeu,
+        bouton_quitter = tk.Button(self.fenetre_jeu,
             text = "quitter", 
             fg = 'red', 
             command = self.fenetre_jeu.destroy, 
             font=("Helvetica", 18)
         )
 
-        boutonquitter.pack(
+        bouton_quitter.pack(
             side = 'bottom',
             pady = 20 
         )
@@ -95,7 +107,7 @@ class Jeu:
         self.canvas = tk.Canvas(
             self.fenetre_jeu,
             width=largeur_ecran,
-            height=largeur_ecran - 100,
+            height=hauteur_ecran - 100,
             bg="black"
         )
 
@@ -107,13 +119,18 @@ class Jeu:
 
         self.briques = []
         # On crée 4 rangées de briques espacées proprement
+        if self.niveau == 1:
+            classes_briques = [Brique]  # on met que des briques normales pour le niveau 1
+        else:
+            classes_briques = [Brique, Brique_dur]  # 50% de chance pour chaque classe
+
         for rangee in range(4):
             for col in range(12):
                 x_pos = 15 + col * 98
                 y_pos = 50 + rangee * 30
-                nouvelle_brique = Brique(self.canvas, x_pos, y_pos)
+                ClasseChoisie = random.choice(classes_briques)  # 1. On choisit une classe au hasard (50% de chance pour chaque)
+                nouvelle_brique = ClasseChoisie(self.canvas, x_pos, y_pos)  # 2. On instancie la brique choisie dynamiquement
                 self.briques.append(nouvelle_brique)
-
 
         #mise en place du système de déplacement de la raquette avec les touches gauche et droite
         self.fenetre_jeu.bind(
@@ -175,10 +192,6 @@ class Jeu:
             self.score += 10
             self.label_score.config(text=f"Score : {self.score}")
 
-        #Détection des briques placées au bon endroit 
-        if self.balle.collision_briques(self.briques):
-            self.score += 10
-            self.label_score.config(text=f"Score : {self.score}")
 
         # S'il reste des vies et toutes les briques sont détruites, on affiche "victoire"
         if len(self.briques) == 0:

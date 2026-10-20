@@ -7,7 +7,7 @@ hauteur_ecran = 600
 largeur_raquette = 70
 hauteur_raquette = 10
 vitesse_raquette = 10
-
+    
 rayon_balle = 10
 vitesse_balle = 5
 
@@ -74,8 +74,8 @@ class Balle:
             outline="red"
         )
 
-        self.dx = random.choice([-5, 5])
-        self.dy = -5
+        self.dx = random.choice([-vitesse_balle, vitesse_balle])
+        self.dy = -vitesse_balle
 
     #mise en place du système de déplacement de la balle
     def deplacer(self):
@@ -131,54 +131,122 @@ class Balle:
         # Objets touchés par la balle
         objets = self.canvas.find_overlapping(x1, y1, x2, y2)
 
-        for brique in briques:
-            if brique.objet in objets:
-                # Coordonnées de la brique
-                bx1, by1, bx2, by2 = self.canvas.coords(brique.objet)
+        for brique in list(briques):
+            if brique.objet not in objets:
+                continue
 
-                # Déterminer le côté de collision
-                choc_horizontal = (
-                    ancien_x2 <= bx1 or ancien_x1 >= bx2
-                )
+            # Coordonnées de la brique
+            bx1, by1, bx2, by2 = self.canvas.coords(brique.objet)
 
-                choc_vertical = (
-                    ancien_y2 <= by1 or ancien_y1 >= by2
-                )
+            # Déterminer si la balle a franchi un bord horizontal
+            choc_horizontal = (
+                (ancien_x2 <= bx1 and x2 >= bx1)
+                or (ancien_x1 >= bx2 and x1 <= bx2)
+            )
 
-                if choc_horizontal and not choc_vertical:
-                    # Collision sur un côté gauche ou droit
-                    self.dx = -self.dx
+            # Déterminer si la balle a franchi un bord vertical
+            choc_vertical = (
+                (ancien_y2 <= by1 and y2 >= by1)
+                or (ancien_y1 >= by2 and y1 <= by2)
+            )
 
-                elif choc_vertical and not choc_horizontal:
-                    # Collision sur le dessus ou le dessous
-                    self.dy = -self.dy
+            # Si le côté est ambigu, utiliser la profondeur de pénétration
+            largeur = min(x2, bx2) - max(x1, bx1)
+            hauteur = min(y2, by2) - max(y1, by1)
 
+            if not choc_horizontal and not choc_vertical:
+                if largeur < hauteur:
+                    choc_horizontal = True
                 else:
-                    # Collision sur un coin
-                    self.dx = -self.dx
-                    self.dy = -self.dy
+                    choc_vertical = True
 
-                # Détruire la brique touchée
+            # Position corrigée de la balle
+            nx1, ny1, nx2, ny2 = x1, y1, x2, y2
+
+            if choc_horizontal:
+                self.dx = -self.dx
+
+                if (ancien_x1 + ancien_x2) / 2 < (bx1 + bx2) / 2:
+                    nx2 = bx1
+                    nx1 = nx2 - (x2 - x1)
+                else:
+                    nx1 = bx2
+                    nx2 = nx1 + (x2 - x1)
+
+            if choc_vertical:
+                self.dy = -self.dy
+
+                if (ancien_y1 + ancien_y2) / 2 < (by1 + by2) / 2:
+                    ny2 = by1
+                    ny1 = ny2 - (y2 - y1)
+                else:
+                    ny1 = by2
+                    ny2 = ny1 + (y2 - y1)
+
+            # Appliquer la nouvelle position
+            self.canvas.coords(
+                self.objet,
+                nx1, ny1, nx2, ny2
+            )
+
+            # Une brique dure devient une brique simple
+            if isinstance(brique, Brique_dur):
+                nouvelle_brique = Brique(
+                    self.canvas,
+                    brique.x,
+                    brique.y
+                )
+
+                index = briques.index(brique)
+                brique.detruire()
+                briques[index] = nouvelle_brique
+
+            else:
+                # Une brique simple est détruite
                 brique.detruire()
                 briques.remove(brique)
 
-                return True
-        return False
+            return True
 
+        return False
     
 class Brique:
 
     def __init__(self, canvas, x, y):
-
         self.canvas = canvas
+
+        # 1. On stocke x et y pour pouvoir les retrouver si besoin
+        self.x = x
+        self.y = y
+
         self.objet = canvas.create_rectangle(
             x,
             y, 
             x + largeur_brique,
             y + hauteur_brique,
-            fill="green",
-            outline="green",
+            fill="#58B41B",
+            outline="#58B41B",
             tags="brique"
+        )
+    #On ajoute la méthode detruire ici aussi
+    def detruire(self):
+        self.canvas.delete(self.objet)
+
+class Brique_dur:
+
+    def __init__(self, canvas, x, y):
+        self.canvas = canvas
+        # 1. On stocke également x et y ici
+        self.x = x
+        self.y = y
+        self.objet = canvas.create_rectangle(
+            x,
+            y, 
+            x + largeur_brique,
+            y + hauteur_brique,
+            fill="#26500A", # Super choix de vert foncé !
+            outline="#26500A",
+            tags="brique_dur"
         )
 
     def detruire(self):
